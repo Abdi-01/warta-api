@@ -36,6 +36,7 @@ module.exports = {
     updateNews: async (req, res, next) => {
         try {
             let { idnews, judul, deskripsi, kategori, images } = req.body
+            console.log(req.body)
             let queryUpdate = `Update news set judul = ${db.escape(judul)}, deskripsi = ${db.escape(deskripsi)},
             kategori = ${db.escape(kategori)}, images = ${db.escape(images)} where idnews=${db.escape(idnews)};`
 
@@ -53,4 +54,13 @@ module.exports = {
             next(error)
         }
     },
+    updateView: async (req, res, next) =>{
+        try {
+            let {idnews, view} = req.body
+            await dbQuery(`Update news set view = ${db.escape(view)} where idnews =${idnews}`)
+            res.status(200).send("Update view success✅")
+        } catch (error) {
+            next(error)
+        }
+    }
 }
