@@ -4,8 +4,13 @@ const Crypto = require('crypto')
 module.exports = {
     addNews: async (req, res, next) => {
         try {
-            let queryInsert = `Insert into news set ?`
-            queryInsert = await dbQuery(queryInsert, { ...req.body })
+            let { judul, deskripsi, kategori, images, author, view } = req.body
+            let queryInsert = `Insert into news (judul,deskripsi, kategori, images, author, view)
+            values (${db.escape(judul)},${db.escape(deskripsi)},${db.escape(kategori)},
+            ${db.escape(images)},${db.escape(author)},${db.escape(view)});`
+            // let queryInsert = `Insert into news set ?`
+            // queryInsert = await dbQuery(queryInsert, { ...req.body })
+            queryInsert = await dbQuery(queryInsert)
 
             res.status(200).send({ status: "Success Add News ✅", results: queryInsert })
         } catch (error) {
@@ -15,7 +20,8 @@ module.exports = {
     getNews: async (req, res, next) => {
         try {
             // if (req.user.idrole == 1) {
-            let getSQL, dataSearch = [];
+            let getSQL, dataSearch = [],
+                getKomentar = `Select * from komentar;`
 
             for (let prop in req.query) {
                 dataSearch.push(`${prop}=${db.escape(req.query[prop])}`)
@@ -28,6 +34,15 @@ module.exports = {
             }
 
             let get = await dbQuery(getSQL)
+            let getComment = await dbQuery(getKomentar)
+            get.forEach(item => {
+                item.comment = []
+                getComment.forEach(el => {
+                    if (item.idnews == el.idnews) {
+                        item.comment.push(el)
+                    }
+                })
+            })
             res.status(200).send(get)
         } catch (error) {
             next(error)
@@ -54,13 +69,61 @@ module.exports = {
             next(error)
         }
     },
-    updateView: async (req, res, next) =>{
+    updateView: async (req, res, next) => {
         try {
-            let {idnews, view} = req.body
+            let { idnews, view } = req.body
             await dbQuery(`Update news set view = ${db.escape(view)} where idnews =${idnews}`)
             res.status(200).send("Update view success✅")
         } catch (error) {
             next(error)
         }
-    }
+    },
+    addKomentar: async (req, res, next) => {
+        try {
+            // let { idnews, komentar } = req.body
+            let queryInsert = `Insert into komentar (idnews, komentar)
+                values (${db.escape(req.body.idnews)}, ${db.escape(req.body.komentar)});`
+
+            queryInsert = await dbQuery(queryInsert)
+            // console.log("Cek Komentar :", queryInsert)
+
+            // let { idkomentar, idnews, iduser, komentar } = queryInsert[0]
+
+            // // Membuat Token
+            // let token = createToken({ idkomentar, idnews, iduser, komentar })
+            // console.log("data token :", token)
+
+            // res.status(200).send({ idkomentar, idnews, iduser, komentar, token })
+            res.status(200).send({ status: "Success Add Komentar ✅", results: queryInsert })
+        } catch (error) {
+            next(error)
+        }
+    },
+    getKomentar: async (req, res, next) => {
+        try {
+            let getSQL, dataSearch = [];
+
+            for (let prop in req.query) {
+                dataSearch.push(`${prop}=${db.escape(req.query[prop])}`)
+            }
+
+            if (dataSearch.length > 0) {
+                getSQL = `Select * from komentar where ${dataSearch.join(' AND ')};`
+            } else {
+                getSQL = `Select * from komentar;`
+            }
+
+            let get = await dbQuery(getSQL)
+            res.status(200).send(get)
+        } catch (error) {
+            next(error)
+        }
+    },
+    deleteKomentar: async (req, res, next) => {
+        try {
+
+        } catch (error) {
+            next(error)
+        }
+    },
 }

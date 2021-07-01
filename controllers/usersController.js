@@ -101,13 +101,13 @@ module.exports = {
             if (req.user.iduser) {
                 let getSQL = `Select * from user where iduser=${db.escape(req.user.iduser)};`
                 let get = await dbQuery(getSQL)
-                let { iduser, username, email, otp } = get[0]
+                let { iduser, username, email, role, idstatus, otp } = get[0]
 
                 // Membuat Token
-                let token = createToken({ iduser, username, email })
+                let token = createToken({ iduser, username, email, role, idstatus })
                 console.log("data token :", token)
 
-                res.status(200).send({ iduser, username, email, token })
+                res.status(200).send({ iduser, username, email, role, idstatus, token })
             }
         } catch (error) {
             next(error)
