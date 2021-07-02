@@ -81,8 +81,9 @@ module.exports = {
     addKomentar: async (req, res, next) => {
         try {
             // let { idnews, komentar } = req.body
-            let queryInsert = `Insert into komentar (idnews, komentar)
-                values (${db.escape(req.body.idnews)}, ${db.escape(req.body.komentar)});`
+        
+            let queryInsert = `Insert into komentar (idnews, komentar, iduser)
+                values (${db.escape(req.body.idnews)}, ${db.escape(req.body.komentar)}, ${db.escape(req.body.iduser)});`
 
             queryInsert = await dbQuery(queryInsert)
             // console.log("Cek Komentar :", queryInsert)
@@ -108,9 +109,9 @@ module.exports = {
             }
 
             if (dataSearch.length > 0) {
-                getSQL = `Select * from komentar where ${dataSearch.join(' AND ')};`
+                getSQL = `select idkomentar, idnews, komentar, username from komentar k JOIN user u on u.iduser = k.iduser where ${dataSearch.join(' AND ')};`
             } else {
-                getSQL = `Select * from komentar;`
+                getSQL = `select idkomentar, idnews, komentar, username from komentar k JOIN user u on u.iduser = k.iduser;`
             }
 
             let get = await dbQuery(getSQL)
