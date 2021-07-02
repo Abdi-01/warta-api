@@ -2,11 +2,11 @@ const mysql = require('mysql')
 const util = require('util')
 
 const db = mysql.createPool({
-    host: "localhost",
-    user: "allysarh",
-    password: "Fivestars5",
-    database: "db_warta_3",
-    port: 3306,
+    host: "139.162.63.45",
+    user: "docsql",
+    password: "docker123",
+    database: "dbwarta",
+    port: 8060,
     multipleStatements: true
 })
 
