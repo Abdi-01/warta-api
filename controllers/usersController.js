@@ -77,16 +77,17 @@ module.exports = {
         try {
             if (req.body.email && req.body.password) {
                 let hashPassword = Crypto.createHmac("sha256", "wartaNews").update(req.body.password).digest("hex")
+                
                 let getSQL = `Select * from user where email=${db.escape(req.body.email)} and password=${db.escape(hashPassword)};`
                 let get = await dbQuery(getSQL)
+                
+                let { iduser, username, email, otp, idstatus } = get[0]
 
-                let { iduser, username, email, otp } = get[0]
-
-                // Membuat Token
+                // // Membuat Token
                 let token = createToken({ iduser, username, email })
                 console.log("data token :", token)
-
-                res.status(200).send({ iduser, username, email, token })
+                
+                res.status(200).send({ iduser, username, email, token, idstatus })
             }
         } catch (error) {
             next(error)
